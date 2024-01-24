@@ -33,7 +33,7 @@ function Header() {
         <AiOutlineSearch />
     </Button>
 
-    <div className='flex gap-2'>
+    <div className='flex gap-2 md:order-2'>
         {/* Dark mode icon */}
         <Button className='w-12 h-10 hidden sm:inline' color='gray' pill>
             <FaMoon />
@@ -41,7 +41,7 @@ function Header() {
 
         {/* Sign In button */}
         <Link to='/sign-in' >
-            <Button gradientDuoTone='purpleToBlue' pill>
+            <Button gradientDuoTone='purpleToBlue' pill outline>
                 SignIn
             </Button>
         </Link>
@@ -53,7 +53,7 @@ function Header() {
 
     {/* Menu of NavBar */}
     <Navbar.Collapse>
-        
+
         <Navbar.Link active={path==="/"} as={'div'}>
             <Link to="/">
                 Home
