@@ -1,1 +1,4 @@
-- routers added
+- created the header section.
+- used a library called flowbite which provides components such as buttons, input field, etc. which run on top of tailwindcss.
+- used react-icons for the button with moon thingy in it for dark mode
+- made the header responsive.
