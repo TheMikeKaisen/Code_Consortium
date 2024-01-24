@@ -2,7 +2,7 @@ import express from 'express'
 import 'dotenv/config'
 
 // db
-import connectDB from '../db/index.js'
+import connectDB from './db/index.js'
 
 const app = express()
 
