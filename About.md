@@ -1,1 +1,4 @@
-- Completed Sign-Up page ui.
+- added prettier configurations
+- installed cors
+- completed sign in functionality
+
