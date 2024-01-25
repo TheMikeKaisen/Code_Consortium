@@ -4,8 +4,6 @@ import app from './app.js'
 // db
 import connectDB from './db/index.js'
 
-express.json()
-
 connectDB()
 .then(() => {
     app.listen(process.env.PORT, () => {
