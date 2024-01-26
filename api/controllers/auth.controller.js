@@ -65,7 +65,7 @@ const signInRouter = asyncHandler(async(req, res) => {
         const {email, password} = req.body
     
         if(!email || (email.trim()==="")){
-            throw new ApiError(404, "Username not provided!")
+            throw new ApiError(404, "Email not provided!")
         }
     
         const user = await User.findOne({email})
