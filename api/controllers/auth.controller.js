@@ -113,9 +113,73 @@ const signInRouter = asyncHandler(async(req, res) => {
 
 })
 
+const google = asyncHandler(async(req, res)=>{
+    const {name, email, googlePhotoUrl} = req.body
+    
+    try {
+        // finding if the user already exists
+        const user = await User.findOne({email})
+        if(user){
+            const token = jwt.sign({
+                id: user._id
+            }, process.env.JWT_SECRET)
+    
+            const options = {
+                httpOnly: true,
+                secured: true
+            }
+    
+            const loggedInUser = await User.findById(user._id).select("-password")
+    
+            res.status(200)
+            .cookie("token", token, options)
+            .json(
+                new ApiResponse(200, loggedInUser, "sign in successful")
+            )
+        }else{
+            const generatedPassword =
+            Math.random().toString(36).slice(-8) +
+            Math.random().toString(36).slice(-8);
+    
+            const hashedPassword = await bcryptjs.hashSync(generatedPassword, 10)
+    
+            const newUser = await User.create({
+                username: name.toLowerCase().split(' ').join('') +
+                Math.random().toString(9).slice(-4), 
+                email, 
+                password: hashedPassword,
+                photoUrl: googlePhotoUrl 
+            })
+            const token = jwt.sign({
+                id: newUser._id
+            }, process.env.JWT_SECRET)
+    
+            const options = {
+                httpOnly: true,
+                secured: true
+            }
+    
+            const loggedInUser = await User.findById(newUser._id).select("-password")
+    
+            res.status(200)
+            .cookie("token", token, options)
+            .json(
+                new ApiResponse(200, loggedInUser, "Sign In successful")
+            )
+        }
+    } catch (error) {
+        console.log(error.message)
+        res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message || 'Internal Server Error',
+            errors: error.errors || [],
+        });
+    }
+})
 export {
     signUpRouter,
-    signInRouter
+    signInRouter,
+    google
 }
 
 
