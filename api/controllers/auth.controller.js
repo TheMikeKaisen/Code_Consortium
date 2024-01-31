@@ -84,7 +84,7 @@ const signInRouter = asyncHandler(async(req, res) => {
         }
     
         const token = await jwt.sign({
-            id: user._id, 
+            _id: user._id, 
         }, process.env.JWT_SECRET)
         let options = {
             httpOnly: true, 
@@ -92,15 +92,16 @@ const signInRouter = asyncHandler(async(req, res) => {
         }
 
         const loggedInUser = await User.findById(user._id).select('-password')
-    
         res.status(200)
         .cookie('token', token, options)
         .json(
+            
             new ApiResponse(
                 200, 
                 loggedInUser,
                 "Sign In successful"
             )
+            
         )
     } catch (error) {
         console.log(error.message)
@@ -176,10 +177,84 @@ const google = asyncHandler(async(req, res)=>{
         });
     }
 })
+
+const updateUser = asyncHandler(async(req, res)=>{
+
+    try {
+        const {username, email, password} = req.body
+    
+        // updated username validation
+        if(username){
+            const usernameAlreadyExist = await User.findOne({username: username})
+            if(usernameAlreadyExist){
+                throw new ApiError(400, "Username already exists!")
+            }
+            if(username.trim().length === 0){
+                throw new ApiError(400, "username cannot be empty")
+            }
+            if(username.toLowerCase() !== username){
+                throw new ApiError(400, "username must be in lowercase")
+            }
+            if(username.includes(" ")){
+                throw new ApiError(400, "username cannot contain spaces!")
+            }
+        }
+    
+        // updated password validation
+        if(password){
+            if(password.trim() === ""){
+                throw new ApiError(400, "password cannot be empty")
+            }
+            if(password.length < 7 || password.length >20){
+                throw new ApiError(400, "length of the password should be greater than 7 and smaller than 20")
+            }
+            
+            if(password.includes(" ")){
+                throw new ApiError(400, "password should not contain any spaces!")
+            }
+        }
+    
+        if(email){
+            const emailAlreadyExists = await User.findOne({email})
+            if(emailAlreadyExists){
+                throw new ApiError(400, "Email already exists!")
+            }
+            if(email.trim().length === 0){
+                throw new ApiError(400, "password cannot be empty")
+            }
+    
+        }
+    
+        const updatedUser = await User.findByIdAndUpdate(req.user._id, {
+            $set: {
+                username, 
+                email, 
+                password
+            }
+        }, {new: true})
+    
+        const showUpdatedUser = await User.findById(req.user._id).select("-password")
+        
+        res.status(200)
+        .json(
+            new ApiResponse(200, showUpdatedUser, "User successfully updated")
+        )
+    } catch (error) {
+        console.log(error.message)
+        res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message || 'Internal Server Error',
+            errors: error.errors || [],
+        });
+    }
+
+
+})
 export {
     signUpRouter,
     signInRouter,
-    google
+    google,
+    updateUser
 }
 
 
